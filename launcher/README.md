@@ -1,28 +1,40 @@
-# AFTERDAY Launcher update configuration
+# Настройка обновлений лаунчера AFTERDAY
 
-The launcher should use the repository:
+Лаунчер должен использовать следующий репозиторий:
 
 ```text
 afterdayrevival/afterday-server
 ```
 
-The local `config.json` may contain a `repo` property. If it is present, it overrides the updater default. Use `config.example.json` as the safe template; copy it to `config.json` locally only when needed. The local config is ignored by Git.
+## Адреса загрузки
 
-Update manifest URL:
+Манифест последнего релиза:
 
 ```text
 https://github.com/afterdayrevival/afterday-server/releases/latest/download/manifesto.json
 ```
 
-Version-pinned update ZIP URL:
+Архив конкретной версии:
 
 ```text
-https://github.com/afterdayrevival/afterday-server/releases/download/<VERSION>/atualizacao.zip
+https://github.com/afterdayrevival/afterday-server/releases/download/<ВЕРСИЯ>/atualizacao.zip
 ```
 
-Release assets required by the updater:
+## Файлы релиза
 
-- `manifesto.json`
-- `atualizacao.zip`
+В каждом релизе должны присутствовать:
 
-The updater verifies the ZIP SHA-256 and each file hash before applying any changes. Never add local player identity, server address, configuration, saves, logs, certificates or private keys to a release package.
+- `manifesto.json` — номер версии и контрольные суммы SHA-256.
+- `atualizacao.zip` — архив с файлами обновления.
+
+Обновлятор сначала проверяет контрольную сумму архива, затем контрольные суммы каждого файла. Только после успешной проверки он заменяет локальные файлы.
+
+## Локальная конфигурация
+
+Файл `config.example.json` — безопасный пример настроек. При необходимости скопируйте его в `config.json`. Локальный `config.json` не должен попадать в GitHub.
+
+## Что нельзя включать в обновление
+
+Не добавляйте в архив локальные настройки, адрес сервера, Steam ID, сохранения игроков, журналы, сертификаты, приватные ключи и другие персональные данные.
+
+Список файлов, попадающих в архив, задаётся в `tools/build_release.py`. Перед выпуском версии обязательно проверьте этот список.
