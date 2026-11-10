@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+painel/config.json
+linux/vps.conf
+
+# Local game/server identity and settings
+cliente/host.txt
+cliente/steamid.txt
+launcher/config.json
+launcher/versao.txt
+
+# Logs, captures, runtime data and generated packages
+*.log
+logs/
+servicos/tls/capturas/
+servicos/firestore_emu/emu_data*/
+dist/
+build/
+*.zip
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
