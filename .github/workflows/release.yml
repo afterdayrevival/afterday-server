@@ -1,0 +1,48 @@
+name: Build and publish updater release
+
+on:
+  push:
+    tags:
+      - "20*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build update package
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          python tools/build_release.py "$RELEASE_VERSION" --notes "AFTERDAY Server update $RELEASE_VERSION"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            "dist/$RELEASE_VERSION/manifesto.json" \
+            "dist/$RELEASE_VERSION/atualizacao.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "AFTERDAY Server $RELEASE_VERSION" \
+            --notes "Automatic update package for AFTERDAY Server $RELEASE_VERSION." \
+            --verify-tag \
+            --latest
