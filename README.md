@@ -1,72 +1,72 @@
 # AFTERDAY Server
 
-Independent community server project for **The Day Before**.
+Самостоятельный проект серверной инфраструктуры сообщества для игры **The Day Before**.
 
-Repository: https://github.com/afterdayrevival/afterday-server
+**Репозиторий:** https://github.com/afterdayrevival/afterday-server
 
-## Project layout
+## Структура проекта
 
-The repository is intended to contain:
+- `cliente/` — клиентское подключение и скрипты совместимости.
+- `host/` — основной сервер и его скрипты.
+- `host_otimizado/` — экспериментальная оптимизированная версия сервера.
+- `servicos/` — настройки локальных сервисов и вспомогательные службы.
+- `launcher/` — игровой лаунчер, обновлятор и языковые файлы.
+- `tools/build_release.py` — сборка пакета обновления для лаунчера.
+- `.github/workflows/release.yml` — автоматическая публикация GitHub Release после отправки тега версии.
 
-- `cliente/` — client-side connection and compatibility scripts.
-- `host/` — standard host/server runner and scripts.
-- `host_otimizado/` — optional optimized host implementation.
-- `servicos/` — local service configuration and helper services.
-- `launcher/` — desktop launcher, updater and language resources.
-- `tools/build_release.py` — creates updater-compatible release assets.
-- `.github/workflows/release.yml` — publishes a GitHub Release when a version tag is pushed.
+## Права на исходный код
 
-## Important: source and distribution rights
+Перед добавлением и публичным распространением кода из другого репозитория необходимо убедиться, что у вас есть разрешение автора или лицензия, допускающая копирование, изменение и распространение. Публичная доступность репозитория сама по себе не даёт таких прав.
 
-This repository starts with project automation and documentation. Before importing or publicly distributing code from another repository, confirm that you have permission or a license that allows copying, modification and redistribution. A public GitHub repository is not automatically open-source licensed.
+Не добавляйте в репозиторий исполняемые файлы игры, игровые ресурсы, приватные ключи, сертификаты, сохранения игроков, Steam ID, локальные настройки IP сервера, журналы и персональные данные.
 
-Do not add game binaries, game assets, private keys, certificates, player saves, Steam IDs, server IP configuration, logs or personal data.
+## Адрес обновлений лаунчера
 
-## Launcher update endpoint
-
-The launcher must use this repository for update checks:
+Лаунчер AFTERDAY должен проверять обновления в репозитории:
 
 ```text
 afterdayrevival/afterday-server
 ```
 
-Its updater downloads these files from the latest GitHub Release:
+Из последнего опубликованного GitHub Release скачиваются два файла:
 
-- `manifesto.json`
-- `atualizacao.zip`
+- `manifesto.json` — манифест версии и контрольные суммы.
+- `atualizacao.zip` — архив обновления.
 
-The manifest contains a version, ZIP SHA-256, per-file SHA-256 values and release notes. The updater must verify the ZIP and every file before replacing local files.
+Манифест содержит номер версии, SHA-256 архива, SHA-256 каждого файла и описание изменений. Перед установкой обновлятор обязан проверить архив и каждый файл.
 
-## Automatic release process
+## Автоматическая публикация обновлений
 
-The workflow publishes a release when a tag beginning with `20` is pushed.
+GitHub Actions запускается при отправке тега, начинающегося с `20`.
 
-Example version:
+Пример публикации версии:
 
 ```powershell
 git add .
-git commit -m "Prepare AFTERDAY update"
+git commit -m "Обновление сервера"
 git push origin main
 
 git tag 2026.11.10-1
 git push origin 2026.11.10-1
 ```
 
-GitHub Actions then:
+После отправки тега GitHub Actions автоматически:
 
-1. Checks out the tagged source.
-2. Builds `dist/<version>/manifesto.json` and `atualizacao.zip`.
-3. Creates a GitHub Release for the pushed tag.
-4. Uploads both assets and marks the release as latest.
+1. Получает исходный код на указанной версии.
+2. Запускает `tools/build_release.py`.
+3. Создаёт `dist/<версия>/manifesto.json` и `atualizacao.zip`.
+4. Создаёт GitHub Release.
+5. Прикрепляет оба файла и отмечает релиз как последний.
 
-The launcher should never include local configuration or player data in an update. The allowlist in `tools/build_release.py` defines which code files are distributed.
+Для публикации используется встроенный секрет `GITHUB_TOKEN` с разрешением `contents: write`. Личный токен GitHub создавать и хранить в репозитории не нужно.
 
-## First-time setup
+## Первый запуск
 
-1. Add the authorized project source files.
-2. Confirm the updater's repository constant is `afterdayrevival/afterday-server`.
-3. Verify the updater's protected paths and release allowlist.
-4. Push a test version tag.
-5. Check the Actions run and the two assets on the Release page.
+1. Добавьте в репозиторий исходные файлы проекта, которые вы вправе распространять.
+2. Проверьте, что обновлятор использует репозиторий `afterdayrevival/afterday-server`.
+3. Проверьте список файлов, включаемых в пакет обновления.
+4. Отправьте тестовый тег версии.
+5. Откройте вкладку Actions и убедитесь, что сборка завершилась успешно.
+6. Проверьте наличие двух файлов в опубликованном релизе.
 
-GitHub Actions needs only the built-in `GITHUB_TOKEN` with `contents: write`; do not create or commit a personal access token.
+**Не отправляйте тег релиза до добавления исходных файлов:** сборка специально завершится ошибкой, если в проекте пока нечего упаковывать.
