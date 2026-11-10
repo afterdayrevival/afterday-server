@@ -1,4 +1,4 @@
-name: Build and publish updater release
+name: Сборка и публикация обновления
 
 on:
   push:
@@ -14,26 +14,27 @@ concurrency:
 
 jobs:
   publish:
+    name: Сборка релиза AFTERDAY
     runs-on: ubuntu-latest
     steps:
-      - name: Check out tagged source
+      - name: Получение исходного кода
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Установка Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Build update package
+      - name: Сборка архива обновления
         env:
           RELEASE_VERSION: ${{ github.ref_name }}
         run: |
-          python tools/build_release.py "$RELEASE_VERSION" --notes "AFTERDAY Server update $RELEASE_VERSION"
+          python tools/build_release.py "$RELEASE_VERSION" --notes "Обновление AFTERDAY Server $RELEASE_VERSION"
 
-      - name: Publish GitHub Release
+      - name: Публикация релиза на GitHub
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ github.ref_name }}
@@ -43,6 +44,6 @@ jobs:
             "dist/$RELEASE_VERSION/atualizacao.zip" \
             --repo "$GITHUB_REPOSITORY" \
             --title "AFTERDAY Server $RELEASE_VERSION" \
-            --notes "Automatic update package for AFTERDAY Server $RELEASE_VERSION." \
+            --notes "Автоматически собранное обновление AFTERDAY Server $RELEASE_VERSION." \
             --verify-tag \
             --latest
